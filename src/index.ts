@@ -17,7 +17,7 @@ export default (homebridge: any): void => {
   )
 }
 
-const readFile = (filePath: string, callback: Function): void => {
+const getData = (filePath: string, callback: Function): void => {
   function parseData(data: string) {
     const readings: Reading[] = JSON.parse(data)
     if (readings.length == 0) {
@@ -90,11 +90,11 @@ class WeatherAccessory {
     this.humiditySensor = new Service.HumiditySensor(name+' Humidity')
   }
 
-  update(callback: Function): void {
+  updateTemperature(callback: Function): void {
     if (typeof this.filePath === 'undefined') {
       return this.temperatureSensor.setCharacteristic(Characteristic.StatusFault, 1)
     }
-    readFile(
+    getData(
       this.filePath,
       (err: NodeJS.ErrnoException, data: Reading[]): void => {
         if (err || data === null) {
@@ -105,12 +105,33 @@ class WeatherAccessory {
 
         const latest = data[data.length - 1]
         const temperature = parseFloat(latest.temperature)
-        const humidity = parseFloat(latest.humidity)
 
         this.temperatureSensor.setCharacteristic(Characteristic.CurrentTemperature, temperature)
+
+        callback(null, temperature)
+      }
+    )
+  }
+
+  updateHumidity(callback: Function): void {
+    if (typeof this.filePath === 'undefined') {
+      return this.humiditySensor.setCharacteristic(Characteristic.StatusFault, 1)
+    }
+    getData(
+      this.filePath,
+      (err: NodeJS.ErrnoException, data: Reading[]): void => {
+        if (err || data === null) {
+          this.humiditySensor.setCharacteristic(Characteristic.StatusFault, 1)
+          callback(err)
+          return
+        }
+
+        const latest = data[data.length - 1]
+        const humidity = parseFloat(latest.humidity)
+
         this.humiditySensor.setCharacteristic(Characteristic.CurrentRelativeHumidity, humidity)
 
-        callback(null, true)
+        callback(null, humidity)
       }
     )
   }
@@ -118,12 +139,12 @@ class WeatherAccessory {
   getServices() {
     this.temperatureSensor
       .getCharacteristic(Characteristic.CurrentTemperature)
-      .on('get', this.update.bind(this))
+      .on('get', this.updateTemperature.bind(this))
     ;
 
     this.humiditySensor
       .getCharacteristic(Characteristic.CurrentRelativeHumidity)
-      .on('get', this.update.bind(this))
+      .on('get', this.updateHumidity.bind(this))
     ;
 
     return [this.temperatureSensor, this.humiditySensor]
