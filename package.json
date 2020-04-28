@@ -1,6 +1,6 @@
 {
-  "name": "homebridge-weather",
-  "version": "1.0.0",
+  "name": "homebridge-weather-http-file",
+  "version": "1.0.1",
   "description": "Homebridge plugin to simulate an weather sensor",
   "main": "dist/index.js",
   "scripts": {

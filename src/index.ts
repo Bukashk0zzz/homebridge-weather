@@ -87,7 +87,7 @@ class WeatherAccessory {
     const name = 'Weather';
 
     this.temperatureSensor = new Service.TemperatureSensor(name+' Temperature')
-    this.humiditySensor = new Service.AirQualitySensor(name+' Humidity')
+    this.humiditySensor = new Service.HumiditySensor(name+' Humidity')
   }
 
   update(callback: Function): void {

@@ -11,7 +11,7 @@ The plugin expects to get a list of readings in JSON form:
 ```
 
 ## Installation and configuration
-Run `npm install homebridge-weather`
+Run `npm install homebridge-weather-http-file`
 
 Add an acceessory configuration into your Homebridge config.json:
 ```
